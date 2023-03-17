@@ -5,9 +5,232 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="shortcut icon" href="./assets/imgs/favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <title>Music player</title>
 </head>
 <body>
-    
+    <div class="player">
+        <!-- Dashboard -->
+        <div class="dashboard">
+          <!-- Header -->
+          <header>
+            <h4>Now playing:</h4>
+            <h2>String 57th & 9th</h2>
+          </header>
+      
+          <!-- CD -->
+          <div class="cd">
+            <div class="cd-thumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+            </div>
+          </div>
+      
+          <!-- Control -->
+          <div class="control">
+            <div class="btn btn-repeat">
+              <i class="fas fa-redo"></i>
+            </div>
+            <div class="btn btn-prev">
+              <i class="fas fa-step-backward"></i>
+            </div>
+            <div class="btn btn-toggle-play">
+              <i class="fas fa-pause icon-pause"></i>
+              <i class="fas fa-play icon-play"></i>
+            </div>
+            <div class="btn btn-next">
+              <i class="fas fa-step-forward"></i>
+            </div>
+            <div class="btn btn-random">
+              <i class="fas fa-random"></i>
+            </div>
+          </div>
+      
+          <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+      
+          <audio id="audio" src=""></audio>
+        </div>
+      
+        <!-- Playlist -->
+        <div class="playlist">
+            
+        </div>
+      </div>
+      <script>
+        'use strict';
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+        const playlist = $('.playlist');
+        const playBtn = $('.btn-toggle-play');
+        const audio = $('#audio');
+        const progress = $('#progress');
+        const player = $('.player');
+
+        function getSongs() {
+            return fetch('http://localhost:3000/songs')
+            .then(response => response.json());
+        }
+        function renderPlaylist() {
+            playlist.innerHTML ='';
+                    getSongs().then(songs => {
+                        songs.forEach(song => {
+                            playlist.innerHTML += 
+                            `
+                            <div class="song">
+                                <div class="thumb" 
+                                    style="background-image: url('${song.img}')">
+                                </div>
+                                <div class="body">
+                                    <h3 class="title">${song.name}</h3> 
+                                    <p class="author">${song.singer}</p>
+                                </div>
+                                <div class="option">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </div>
+                            </div>  
+                            `;
+                        })
+                    });
+        }
+        function scrollHidenCD(){
+            const cd = $('.cd');
+            const cdW = cd.offsetWidth;
+            document.onscroll = (e) => {
+                    let scrollTop = window.scrollY || document.documentElement.scrollTop;
+                    let newCDW = (cdW - scrollTop) > 0 ? cdW - scrollTop : 0;
+                    cd.style.width = newCDW + 'px';
+                    cd.style.opacity = newCDW / cdW;
+            };
+        }
+        function getSongByID(ID, cb){
+            return fetch(`http://localhost:3000/songs/${ID}`)
+            .then(response =>  response.json())
+            .then(cb);
+        }
+        function setProgressBar(currTime, duration){
+            let percent = currTime * 100 / duration;
+            percent = Math.floor(percent) || 0;
+            progress.value = percent;
+        }
+        function setCurrentTimeSong(percent){
+            if(percent < 0 || percent > 100)
+                percent = 0;
+            const currentTime = percent * audio.duration / 100;
+            audio.currentTime = currentTime;
+        }
+        function cdThumbRotate(angle){
+            const cdThumb = $('.cd-thumb');
+            cdThumb.style.transform = `rotate(${angle}deg)`;
+        }
+        function audioEventHandler(){
+            
+            audio.addEventListener('play', () => {
+                player.classList.add('playing');
+                audio.addEventListener('timeupdate', () => {setProgressBar(audio.currentTime, audio.duration)});
+            });
+            audio.addEventListener('pause', () => {
+                player.classList.remove('playing');
+                audio.removeEventListener('timeupdate', setProgressBar);
+            });
+            audio.addEventListener('ended', () => {setProgressBar(0, 1)});
+
+            audio.addEventListener('timeupdate', () => {
+                let angle = 0;
+                if(audio.currentTime)
+                    angle = Math.floor(audio.currentTime * 12);
+                cdThumbRotate(angle);
+            });
+        }
+        function btnChangeWhenClicked(){
+            let btns = $$('.btn');
+
+            btns.forEach(btn => {
+                btn.addEventListener('click',() =>{
+                    btn.classList.add('active');
+                    setTimeout(() => {btn.classList.remove('active')},100);
+                })
+            })
+        }
+        function controllerEventHandler(currentSong){
+            const nextBtn = $('.btn-next');
+            const prevBtn = $('.btn-prev');
+            const playBtn = $('.btn-toggle-play');
+
+            btnChangeWhenClicked();
+
+            nextBtn.addEventListener('click', () =>{
+                currentSong++;
+                getSongByID(currentSong, loadAndPlaySong);
+            });
+            prevBtn.addEventListener('click', () =>{
+                currentSong--;
+                getSongByID(currentSong, loadAndPlaySong);
+            });
+            playBtn.addEventListener('click', () => {
+                if(player.classList.contains('playing'))
+                    {
+                        player.classList.remove('playing');
+                        audio.pause();
+                    }
+                else
+                {
+                    player.classList.add('playing');
+                    audio.play();
+                }
+            });
+
+        }
+        function progressBarEventHandler(){
+            progress.addEventListener('mousedown', e => { audio.pause();});
+
+            progress.addEventListener('mouseup', e => { audio.play();});
+
+            progress.addEventListener('input', e => {setCurrentTimeSong(progress.value);});
+        }
+        function loadSong(song){
+            $('.dashboard header h2').textContent = song.name;
+            $('.cd-thumb').style.backgroundImage = `url(${song.img})`;
+            audio.src = song.url;
+            audio.load();
+        }
+        function loadAndPlaySong(song){
+            $('.dashboard header h2').textContent = song.name;
+            $('.cd-thumb').style.backgroundImage = `url(${song.img})`;
+            audio.src = song.url;
+            audio.load();
+            audio.play();
+        }
+        const app = (() =>{
+            let currentSong = 1;
+            return {
+                handlEvents(){
+                    // scroll bar handler
+                    scrollHidenCD();
+
+                    // audio event handler
+                    audioEventHandler();
+
+                    // controller event handler
+                    controllerEventHandler(currentSong);
+
+                    // progress bar handler
+                    progressBarEventHandler();
+
+                },
+                render(){
+                    renderPlaylist();
+                },
+                start(){
+                    getSongByID(currentSong, loadSong);
+                    this.handlEvents();
+                    this.render();
+                },
+            }
+        })();
+
+        app.start();
+
+      </script>
 </body>
 </html>
