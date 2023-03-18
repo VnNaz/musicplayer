@@ -1,0 +1,91 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "author": "typicode"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  },
+  "songs": [
+    {
+      "id": 1,
+      "name": "Europe's Skies",
+      "singer": "Alexander Rybak",
+      "img": "./assets/imgs/pic1.jpg",
+      "url": "./assets/songs/song1.mp3"
+    },
+    {
+      "id": 2,
+      "name": "OAH",
+      "singer": "Alexander Rybak",
+      "img": "./assets/imgs/pic2.jpg",
+      "url": "./assets/songs/song2.mp3"
+    },
+    {
+      "id": 3,
+      "name": "Without me",
+      "singer": "Charlie Puth",
+      "img": "./assets/imgs/pic3.jpg",
+      "url": "./assets/songs/song3.mp3"
+    },
+    {
+      "id": 4,
+      "name": "Golden hour",
+      "singer": "Jvake",
+      "img": "./assets/imgs/pic4.jpg",
+      "url": "./assets/songs/song4.mp3"
+    },
+    {
+      "id": 5,
+      "name": "mockingbird",
+      "singer": "enimem",
+      "img": "./assets/imgs/pic5.jpg",
+      "url": "./assets/songs/song5.mp3"
+    },
+    {
+      "id": 6,
+      "name": "Skyfall",
+      "singer": "adele",
+      "img": "./assets/imgs/pic6.jpg",
+      "url": "./assets/songs/song6.mp3"
+    },
+    {
+      "id": 7,
+      "name": "Set fire to the rain",
+      "singer": "adele",
+      "img": "./assets/imgs/pic7.jpg",
+      "url": "./assets/songs/song7.mp3"
+    },
+    {
+      "id": 8,
+      "name": "To the moon",
+      "singer": "holigan",
+      "img": "./assets/imgs/pic8.jpg",
+      "url": "./assets/songs/song8.mp3"
+    },
+    {
+      "id": 9,
+      "name": "lemon tree",
+      "singer": "Fools garden",
+      "img": "./assets/imgs/pic9.jpg",
+      "url": "./assets/songs/song9.mp3"
+    },
+    {
+      "id": 10,
+      "name": "FELA IGJEN",
+      "singer": "Alexander Rybak",
+      "img": "./assets/imgs/pic10.jpg",
+      "url": "./assets/songs/song10.mp3"
+    }
+  ]
+}
